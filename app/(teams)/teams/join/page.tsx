@@ -42,10 +42,10 @@ export default async function JoinTeamPage({
 
         <Alert className="mt-8">
           <AlertCircle className="h-4 w-4" />
-          <AlertTitle>Don't have a code?</AlertTitle>
+          <AlertTitle>Don&apos;t have a code?</AlertTitle>
           <AlertDescription>
             Team invitation codes are provided by team captains and owners. If
-            you don't have a code, you can either:
+            you don&apos;t have a code, you can either:
             <ul className="list-disc pl-5 mt-2 space-y-1">
               <li>Ask a team owner/captain for an invitation code</li>
               <li>Create your own team</li>

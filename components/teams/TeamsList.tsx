@@ -56,7 +56,7 @@ export function TeamsList({ initialTeams }: TeamsListProps) {
         <div className="text-center py-12">
           <p className="text-lg text-stone-600 dark:text-stone-400">
             {searchQuery
-              ? `No teams found matching "${searchQuery}"`
+              ? `No teams found matching &quot;${searchQuery}&quot;`
               : "No teams found. Create a team to get started!"}
           </p>
         </div>

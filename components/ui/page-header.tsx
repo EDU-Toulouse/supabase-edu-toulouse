@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 
-export interface PageHeaderProps extends React.HTMLAttributes<HTMLDivElement> {}
+export type PageHeaderProps = React.HTMLAttributes<HTMLDivElement>;
 
 export function PageHeader({ className, children, ...props }: PageHeaderProps) {
   return (
@@ -10,8 +10,7 @@ export function PageHeader({ className, children, ...props }: PageHeaderProps) {
   );
 }
 
-export interface PageHeaderHeadingProps
-  extends React.HTMLAttributes<HTMLHeadingElement> {}
+export type PageHeaderHeadingProps = React.HTMLAttributes<HTMLHeadingElement>;
 
 export function PageHeaderHeading({
   className,
@@ -25,8 +24,8 @@ export function PageHeaderHeading({
   );
 }
 
-export interface PageHeaderDescriptionProps
-  extends React.HTMLAttributes<HTMLParagraphElement> {}
+export type PageHeaderDescriptionProps =
+  React.HTMLAttributes<HTMLParagraphElement>;
 
 export function PageHeaderDescription({
   className,

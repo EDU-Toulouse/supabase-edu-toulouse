@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams, redirect } from "next/navigation";
+import { useParams } from "next/navigation";
 import { createBrowserClient } from "@supabase/ssr";
 // import { EventDetail } from "@/components/events/EventDetail"; // Remove import for non-existent component
 import {
@@ -480,7 +480,8 @@ export default function EventDetailPage() {
               {/* Show confirmation below button when registered */}
               {isRegistered && (
                 <p className="text-xs text-muted-foreground mt-2 text-center">
-                  You're all set! We'll send event updates to your email.
+                  You&apos;re all set! We&apos;ll send event updates to your
+                  email.
                 </p>
               )}
             </div>

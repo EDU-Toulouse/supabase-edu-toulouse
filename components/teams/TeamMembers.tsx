@@ -29,8 +29,23 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
+// Define a proper type for the members
+interface MemberProfile {
+  id: string;
+  username: string | null;
+  avatar_url: string | null;
+  discord_username?: string | null;
+}
+
+interface TeamMember {
+  id: string;
+  user_id: string;
+  role: "owner" | "captain" | "member";
+  profiles: MemberProfile | null;
+}
+
 interface TeamMembersProps {
-  members: any[];
+  members: TeamMember[];
   teamId: string;
   userRole: string | null;
 }
@@ -155,9 +170,9 @@ export function TeamMembers({ members, teamId, userRole }: TeamMembersProps) {
       <CardContent>
         <div className="space-y-4">
           {sortedMembers.map((member) => {
-            const profile = member.profiles || {};
+            const profile = member.profiles as MemberProfile | null;
             const memberName =
-              profile.username || profile.discord_username || "Unknown User";
+              profile?.username || profile?.discord_username || "Unknown User";
             const isCurrentUser = user?.id === member.user_id;
             const canManageMember =
               isTeamAdmin && !isCurrentUser && member.role !== "owner";
@@ -169,7 +184,7 @@ export function TeamMembers({ members, teamId, userRole }: TeamMembersProps) {
               >
                 <div className="flex items-center gap-3">
                   <Avatar>
-                    {profile.avatar_url ? (
+                    {profile && profile.avatar_url ? (
                       <AvatarImage src={profile.avatar_url} />
                     ) : (
                       <AvatarFallback>
@@ -180,7 +195,7 @@ export function TeamMembers({ members, teamId, userRole }: TeamMembersProps) {
                   <div>
                     <div className="font-medium">{memberName}</div>
                     <div className="text-sm text-muted-foreground">
-                      {profile.discord_username || ""}
+                      {profile?.discord_username || ""}
                     </div>
                   </div>
                 </div>

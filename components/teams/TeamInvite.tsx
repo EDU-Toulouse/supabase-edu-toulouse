@@ -40,6 +40,9 @@ export function TeamInvite({ teamId, teamName }: TeamInviteProps) {
         .toString(36)
         .substring(2, 10)
         .toUpperCase();
+
+      // You would typically associate this code with the teamId in the database
+      console.log(`Generated invite code for team: ${teamId}`);
       setInviteCode(mockCode);
 
       toast.success("Invitation code generated!");
