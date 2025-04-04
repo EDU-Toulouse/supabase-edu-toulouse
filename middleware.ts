@@ -1,44 +1,47 @@
-import { createServerClient, CookieOptions } from "@supabase/ssr";
+import { createServerClient } from "@supabase/ssr";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { ENV } from "./lib/supabase/env";
 
 export async function middleware(request: NextRequest) {
   // Create a response that we can modify
   let response = NextResponse.next();
 
   // Create a Supabase client configured to use cookies
-  const supabase = createServerClient(ENV.SUPABASE_URL, ENV.SUPABASE_ANON_KEY, {
-    cookies: {
-      get(name: string) {
-        return request.cookies.get(name)?.value;
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        get(name) {
+          return request.cookies.get(name)?.value;
+        },
+        set(name, value, options) {
+          request.cookies.set({
+            name,
+            value,
+            ...options,
+          });
+          response.cookies.set({
+            name,
+            value,
+            ...options,
+          });
+        },
+        remove(name, options) {
+          request.cookies.set({
+            name,
+            value: "",
+            ...options,
+          });
+          response.cookies.set({
+            name,
+            value: "",
+            ...options,
+          });
+        },
       },
-      set(name: string, value: string, options?: CookieOptions) {
-        request.cookies.set({
-          name,
-          value,
-          ...options,
-        });
-        response.cookies.set({
-          name,
-          value,
-          ...options,
-        });
-      },
-      remove(name: string, options?: CookieOptions) {
-        request.cookies.set({
-          name,
-          value: "",
-          ...options,
-        });
-        response.cookies.set({
-          name,
-          value: "",
-          ...options,
-        });
-      },
-    },
-  });
+    }
+  );
 
   // Check auth status
   const {
@@ -47,11 +50,7 @@ export async function middleware(request: NextRequest) {
 
   // If accessing admin routes but not authenticated, redirect to login
   if (request.nextUrl.pathname.startsWith("/admin") && !session) {
-    // Use the proper app URL to ensure correct redirects in production
-    const loginUrl = new URL("/api/auth/login", ENV.APP_URL);
-    // Add returnTo parameter to redirect back after login
-    loginUrl.searchParams.set("returnTo", request.nextUrl.pathname);
-    return NextResponse.redirect(loginUrl);
+    return NextResponse.redirect(new URL("/api/auth/login", request.url));
   }
 
   // If accessing admin routes, check if user is an admin
@@ -63,9 +62,8 @@ export async function middleware(request: NextRequest) {
       .single();
 
     if (error || !profile || !profile.is_admin) {
-      // User is not an admin, redirect to homepage using proper app URL
-      const homeUrl = new URL("/", ENV.APP_URL);
-      return NextResponse.redirect(homeUrl);
+      // User is not an admin, redirect to homepage
+      return NextResponse.redirect(new URL("/", request.url));
     }
   }
 

@@ -3,7 +3,6 @@
 import { createClient } from "./server";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { ENV, getAppUrl } from "./env";
 
 export async function signInWithDiscord() {
   const supabase = await createClient();
@@ -11,7 +10,7 @@ export async function signInWithDiscord() {
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: "discord",
     options: {
-      redirectTo: `${getAppUrl()}/auth/callback`,
+      redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`,
     },
   });
 
