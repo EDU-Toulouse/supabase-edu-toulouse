@@ -10,6 +10,17 @@ const nextConfig = {
     // Similar to ESLint, this will ignore TS errors in production builds
     ignoreBuildErrors: true,
   },
+  // Optimize for Vercel deployment
+  poweredByHeader: false,
+  reactStrictMode: true,
+  swcMinify: true,
+  // Add output configuration for faster builds
+  output: "standalone",
+  // Configure Image optimization
+  images: {
+    domains: ["localhost"],
+    // Add any other domains you need for images here, e.g., Supabase storage URL
+  },
 };
 
 module.exports = nextConfig;
