@@ -1,26 +1,43 @@
-import { createServerClient } from "@supabase/ssr";
+import { createServerClient, CookieOptions } from "@supabase/ssr";
 import { type NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { ENV } from "@/lib/supabase/env";
 
 export async function GET(request: NextRequest) {
   const requestUrl = new URL(request.url);
   const code = requestUrl.searchParams.get("code");
 
+  // Get the returnTo parameter if provided, or default to the base path
+  const returnTo = requestUrl.searchParams.get("returnTo") || "/";
+
   if (code) {
-    const cookieStore = await cookies();
+    const cookieStore = cookies();
     const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      ENV.SUPABASE_URL,
+      ENV.SUPABASE_ANON_KEY,
       {
         cookies: {
-          get(name) {
-            return cookieStore.get(name)?.value;
+          get(name: string) {
+            try {
+              return cookieStore.get(name)?.value;
+            } catch (error) {
+              console.error("Cookie get error:", error);
+              return undefined;
+            }
           },
-          set(name, value, options) {
-            cookieStore.set(name, value, options);
+          set(name: string, value: string, options?: CookieOptions) {
+            try {
+              cookieStore.set(name, value, options);
+            } catch (error) {
+              console.error("Cookie set error:", error);
+            }
           },
-          remove(name, options) {
-            cookieStore.set(name, "", { ...options, maxAge: 0 });
+          remove(name: string, options?: CookieOptions) {
+            try {
+              cookieStore.set(name, "", { ...options, maxAge: 0 });
+            } catch (error) {
+              console.error("Cookie remove error:", error);
+            }
           },
         },
       }
@@ -29,6 +46,17 @@ export async function GET(request: NextRequest) {
     await supabase.auth.exchangeCodeForSession(code);
   }
 
-  // URL to redirect to after sign in process completes
-  return NextResponse.redirect(requestUrl.origin);
+  // First try to get the origin from the request
+  let redirectUrl = requestUrl.origin;
+
+  // For production deployments, make sure we're using the correct Vercel URL if available
+  if (ENV.IS_VERCEL && ENV.VERCEL_ENV !== "development") {
+    // Use APP_URL which includes the Vercel URL when deployed
+    redirectUrl = ENV.APP_URL;
+  }
+
+  // Append the return path if provided
+  return NextResponse.redirect(
+    `${redirectUrl}${returnTo !== "/" ? returnTo : ""}`
+  );
 }

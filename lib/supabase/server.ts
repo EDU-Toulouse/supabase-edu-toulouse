@@ -1,20 +1,29 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { ENV } from "./env";
+import { CookieOptions } from "@supabase/ssr";
 
 export function createClient() {
   const cookieStore = cookies();
 
   return createServerClient(ENV.SUPABASE_URL, ENV.SUPABASE_ANON_KEY, {
     cookies: {
-      get(name) {
+      get(name: string) {
         return cookieStore.get(name)?.value;
       },
-      set(name, value, options) {
-        cookieStore.set(name, value, options);
+      set(name: string, value: string, options?: CookieOptions) {
+        try {
+          cookieStore.set(name, value, options);
+        } catch (error) {
+          // Silent fail for server components - middleware will handle refresh
+        }
       },
-      remove(name, options) {
-        cookieStore.set(name, "", { ...options, maxAge: 0 });
+      remove(name: string, options?: CookieOptions) {
+        try {
+          cookieStore.set(name, "", { ...options, maxAge: 0 });
+        } catch (error) {
+          // Silent fail for server components - middleware will handle refresh
+        }
       },
     },
   });
